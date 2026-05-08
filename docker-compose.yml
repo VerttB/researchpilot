@@ -1,0 +1,17 @@
+services:
+  db:
+    image: postgres:17
+    restart: always
+    env_file:
+      - ./app/api/.env
+    environment:
+      - POSTGRES_USER=researchpilotuser       
+      - POSTGRES_PASSWORD=r3s34rchp1l0t 
+      - POSTGRES_DB=researchpilot    
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
