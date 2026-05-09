@@ -1,26 +1,52 @@
 import { Injectable } from '@nestjs/common';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { UpdateReviewDto } from './dto/update-review.dto';
-
+import { PrismaService } from '../../prisma/prisma.service';
+import { UUID } from 'crypto';
+import { Review, Prisma } from '../../../generated/prisma/browser';
 @Injectable()
 export class ReviewsService {
-  create(createReviewDto: CreateReviewDto) {
-    return 'This action adds a new review';
+  constructor(private prisma: PrismaService){}
+  async create(createReviewDto: CreateReviewDto, ownerId: UUID) {
+    const newReview = await this.prisma.review.create({
+      data: {...createReviewDto, ownerId},
+      
+    })
+
+    return newReview
   }
 
-  findAll() {
-    return `This action returns all reviews`;
+  async findAll(): Promise<Review[]> {
+    const reviews = await this.prisma.review.findMany();
+    return reviews || []
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} review`;
+  async findOne(id: UUID): Promise<Review | null> {
+    const review = await this.prisma.review.findFirst({
+      where: {
+        id: id
+      }
+    })
+
+    return review || null
   }
 
-  update(id: number, updateReviewDto: UpdateReviewDto) {
-    return `This action updates a #${id} review`;
+  async update(id: UUID, updateReviewDto: UpdateReviewDto, ownerId: UUID): Promise<Review> {
+    return await this.prisma.review.update({
+      where: {
+        id: id,
+        ownerId: id
+      },
+      data: updateReviewDto
+    })
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} review`;
+  async remove(id: UUID, ownerId: UUID) {
+    return this.prisma.review.delete({
+      where: {
+        id: id,
+        ownerId: ownerId
+      }
+    })
   }
 }
