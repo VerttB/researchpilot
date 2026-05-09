@@ -25,18 +25,18 @@ model User {
 
 }
 
-enum reviewStatus {
+enum ReviewStatus {
   COMPLETED
-  INPROGRESS
+  IN_PROGRESS
 }
 
 model Review {
   id String @id @default(uuid())
   user User @relation(fields: [ownerId], references: [id])
   name String 
-  status reviewStatus @default(INPROGRESS) 
+  status ReviewStatus @default(IN_PROGRESS) 
   description String
   ownerId String
-  reatedAt DateTime @default(now()) @db.Timestamptz(6)
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
   updatedAt DateTime?  @db.Timestamptz(6) 
 }
