@@ -4,6 +4,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from '../../prisma/prisma.service';
 import { User, Prisma } from '../../../generated/prisma/browser';
 import { UUID } from 'crypto';
+
 @Injectable()
 export class UsersService {
   constructor(private prisma: PrismaService){}
@@ -12,19 +13,31 @@ export class UsersService {
     return 'This action adds a new user';
   }
 
-  async findAll(): Promise<User[] | []> {
+  async findAll(): Promise<User[]> {
     const users = await this.prisma.user.findMany();
     return users || []
   }
 
-  async findOne(id: UUID): Promise<User | null> {
+  async findByEmail(email: string): Promise<User | null> {
+    const user = await this.prisma.user.findUnique({
+      where: {
+        email: email
+      }
+    })
+    return user || null;
+  }
+
+  async findOne(id: UUID): Promise<User> {
     const user = await this.prisma.user.findUnique({
       where:{
         id: id
         } 
       }
     )
-    return user || null;
+    if (!user) {
+      throw new Error('User not found');
+    }
+    return user;
   }
 
   async update(id: UUID, updateUserDto: UpdateUserDto) {
