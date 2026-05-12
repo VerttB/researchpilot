@@ -14,11 +14,16 @@ datasource db {
 
 }
 
+enum Role {
+  USER
+  ADMIN
+}
 
 model User {
   id    String @id @default(uuid())
   email String @unique
   passwordHash String
+  role Role @default(USER)
   reviews Review[]
   createdAt DateTime @default(now()) @db.Timestamptz(6)
   updatedAt DateTime?  @db.Timestamptz(6)
