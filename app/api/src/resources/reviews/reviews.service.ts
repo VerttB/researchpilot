@@ -3,13 +3,14 @@ import { CreateReviewDto } from './dto/create-review.dto';
 import { UpdateReviewDto } from './dto/update-review.dto';
 import { PrismaService } from '../../prisma/prisma.service';
 import { UUID } from 'crypto';
-import { Review, Prisma } from '../../../generated/prisma/browser';
+import { Review } from '../../../generated/prisma/browser';
 @Injectable()
 export class ReviewsService {
   constructor(private prisma: PrismaService){}
   async create(createReviewDto: CreateReviewDto, ownerId: UUID) {
     const newReview = await this.prisma.review.create({
       data: {...createReviewDto, ownerId},
+      
       
     })
 
@@ -35,7 +36,7 @@ export class ReviewsService {
     return await this.prisma.review.update({
       where: {
         id: id,
-        ownerId: id
+        ownerId: ownerId
       },
       data: updateReviewDto
     })

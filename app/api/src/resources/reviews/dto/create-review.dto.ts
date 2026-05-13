@@ -1,5 +1,5 @@
-import { IsEnum, IsNotEmpty } from "class-validator"
-import {  reviewStatus } from "../../../../generated/prisma/client";
+import { IsEnum, IsNotEmpty, IsOptional } from "class-validator"
+import {  ReviewStatus } from "../../../../generated/prisma/client";
 
 export class CreateReviewDto {
     @IsNotEmpty()
@@ -8,8 +8,8 @@ export class CreateReviewDto {
     @IsNotEmpty()
     description!: string
     
-    @IsNotEmpty()
-    @IsEnum(reviewStatus)
-    status!: reviewStatus
+    @IsOptional()
+    @IsEnum(ReviewStatus)
+    status: ReviewStatus = ReviewStatus.IN_PROGRESS
 }
 
