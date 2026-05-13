@@ -4,5 +4,5 @@ export class SignUpDto {
     @IsNotEmpty()
     email!: string;
     @IsNotEmpty()
-    passwordHash!: string;
+    password!: string;
 }

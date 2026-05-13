@@ -13,7 +13,7 @@ export class AuthController {
   @Post('signin')
   async signIn(@Body() signInDto: SignInDto, @Res() res: Response) {
     const token  = await this.authService.signIn(signInDto);
-    res.cookie('acess_token', token, {
+    res.cookie('access_token', token, {
       httpOnly: true,
       sameSite: 'lax'
     })
@@ -23,12 +23,12 @@ export class AuthController {
   @SkipAuth()
   @Post('signup')
   async signUp(@Body() signUpDto: SignUpDto, @Res() res: Response) {
-    const { token, newUser} = await this.authService.signUp(signUpDto)
-    res.cookie('acess_token', token, {
+    const token = await this.authService.signUp(signUpDto)
+    res.cookie('access_token', token, {
       httpOnly: true,
       sameSite: 'lax'
     })
-    res.send({token, newUser})
+    res.send({token})
   }
 
   @Post('logout')

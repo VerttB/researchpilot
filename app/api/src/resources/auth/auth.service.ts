@@ -14,12 +14,12 @@ export class AuthService {
          {}
     
     async signUp(signUpDto: SignUpDto) {
-        signUpDto.passwordHash = await argon2.hash(signUpDto.passwordHash);
-        const newUser = await this.prismaService.user.create({data: signUpDto});
-        const payload = { sub: newUser.id, email: newUser };
+        const passwordHash = await argon2.hash(signUpDto.password);
+        const newUser = await this.prismaService.user.create({data: {...signUpDto, passwordHash: passwordHash}});
+        const payload = { sub: newUser.id, email: newUser.email, role: newUser.role };
         const token = this.jwtService.sign(payload);
 
-        return {token, newUser}
+        return token
 
     }
     async signIn(signInDto: SignInDto) {
@@ -32,7 +32,7 @@ export class AuthService {
             throw new UnauthorizedException('Invalid credentials');
         }
 
-        const payload = { sub: user.id, email: user.email };
+        const payload = { sub: user.id, email: user.email, role: user.role };
         const token = this.jwtService.sign(payload);
 
         return token;
