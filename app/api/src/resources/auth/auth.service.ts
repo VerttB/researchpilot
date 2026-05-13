@@ -15,7 +15,7 @@ export class AuthService {
     
     async signUp(signUpDto: SignUpDto) {
         const passwordHash = await argon2.hash(signUpDto.password);
-        const newUser = await this.prismaService.user.create({data: {...signUpDto, passwordHash: passwordHash}});
+        const newUser = await this.prismaService.user.create({data: {email: signUpDto.email, passwordHash: passwordHash}});
         const payload = { sub: newUser.id, email: newUser.email, role: newUser.role };
         const token = this.jwtService.sign(payload);
 
