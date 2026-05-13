@@ -13,7 +13,7 @@ import { JwtModule } from '@nestjs/jwt';
   imports: [ConfigModule.forRoot({
     envFilePath: '.env',
     isGlobal: true
-  }), PrismaModule, {
+  }), {
     module: PrismaModule,
     global: true
   }, JwtModule.registerAsync({
