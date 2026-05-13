@@ -17,8 +17,8 @@ export class ReviewsService {
     return newReview
   }
 
-  async findAll(): Promise<Review[]> {
-    const reviews = await this.prisma.review.findMany();
+  async findAll(ownerId: UUID): Promise<Review[]> {
+    const reviews = await this.prisma.review.findMany({where: { ownerId: ownerId}});
     return reviews || []
   }
 

@@ -15,8 +15,8 @@ export class ReviewsController {
   }
 
   @Get()
-  findAll() {
-    return this.reviewsService.findAll();
+  findAll( @CurrentUser('sub') userId: UUID) {
+    return this.reviewsService.findAll(userId);
   }
 
   @Get(':id')
