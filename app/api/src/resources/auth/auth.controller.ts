@@ -4,6 +4,7 @@ import { SignInDto } from './dto/sign-in.dto';
 import { SignUpDto } from './dto/sign-up.dto';
 import { SkipAuth } from '../../helpers/decorators/skipauth.decorator';
 import type { Response } from 'express';
+import { cookieConfig } from '../../helpers/common/cookies.config';
 
 @Controller('auth')
 export class AuthController {
@@ -13,10 +14,7 @@ export class AuthController {
   @Post('signin')
   async signIn(@Body() signInDto: SignInDto, @Res() res: Response) {
     const token  = await this.authService.signIn(signInDto);
-    res.cookie('access_token', token, {
-      httpOnly: true,
-      sameSite: 'lax'
-    })
+    res.cookie('access_token', token, cookieConfig)
     res.send({message: token})
     return { message: token}
   }
@@ -24,10 +22,7 @@ export class AuthController {
   @Post('signup')
   async signUp(@Body() signUpDto: SignUpDto, @Res() res: Response) {
     const token = await this.authService.signUp(signUpDto)
-    res.cookie('access_token', token, {
-      httpOnly: true,
-      sameSite: 'lax'
-    })
+    res.cookie('access_token', token, cookieConfig)
     res.send({token})
   }
 

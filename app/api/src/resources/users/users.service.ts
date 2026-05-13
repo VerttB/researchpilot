@@ -1,10 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { PrismaService } from '../../prisma/prisma.service';
-import { User } from '../../../generated/prisma/browser';
+import { PrismaService } from '@/prisma/prisma.service';
+import { User } from '@generated/prisma/browser';
 import { UUID } from 'crypto';
-import { SignUpDto } from '../auth/dto/sign-up.dto';
 
 @Injectable()
 export class UsersService {
