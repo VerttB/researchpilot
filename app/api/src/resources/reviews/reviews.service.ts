@@ -1,9 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { UpdateReviewDto } from './dto/update-review.dto';
-import { PrismaService } from '../../prisma/prisma.service';
+import { PrismaService } from '@/prisma/prisma.service';
 import { UUID } from 'crypto';
-import { Review } from '../../../generated/prisma/browser';
+import { Review } from '@generated/prisma/browser';
+
 @Injectable()
 export class ReviewsService {
   constructor(private prisma: PrismaService){}

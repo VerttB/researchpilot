@@ -3,8 +3,7 @@ import { ReviewsService } from './reviews.service';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { UpdateReviewDto } from './dto/update-review.dto';
 import { type UUID } from 'crypto';
-import type { Request } from 'express';
-import { CurrentUser } from '../../helpers/decorators/currentUser.decorator';
+import { CurrentUser } from '@/helpers/decorators/currentUser.decorator';
 @Controller('reviews')
 export class ReviewsController {
   constructor(private readonly reviewsService: ReviewsService) {}

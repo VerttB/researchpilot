@@ -1,5 +1,5 @@
 import { IsEnum, IsNotEmpty, IsOptional } from "class-validator"
-import {  ReviewStatus } from "../../../../generated/prisma/client";
+import {  ReviewStatus } from "@generated/prisma/client";
 
 export class CreateReviewDto {
     @IsNotEmpty()
