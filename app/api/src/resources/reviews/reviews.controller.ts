@@ -20,8 +20,8 @@ export class ReviewsController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: UUID) {
-    return this.reviewsService.findOne(id);
+  findOne(@Param('id') id: UUID, @CurrentUser('sub') userId: UUID) {
+    return this.reviewsService.findOne(id,userId);
   }
 
   @Patch(':id')

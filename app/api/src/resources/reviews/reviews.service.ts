@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { UpdateReviewDto } from './dto/update-review.dto';
 import { PrismaService } from '../../prisma/prisma.service';
@@ -22,14 +22,18 @@ export class ReviewsService {
     return reviews || []
   }
 
-  async findOne(id: UUID): Promise<Review | null> {
+  async findOne(id: UUID, ownerId: UUID): Promise<Review> {
     const review = await this.prisma.review.findFirst({
       where: {
-        id: id
+        id: id,
+        ownerId: ownerId
       }
     })
 
-    return review || null
+    if(!review){
+      throw new NotFoundException()
+    }
+    return review
   }
 
   async update(id: UUID, updateReviewDto: UpdateReviewDto, ownerId: UUID): Promise<Review> {
