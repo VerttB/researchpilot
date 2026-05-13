@@ -1,4 +1,8 @@
+import { IsNotEmpty } from "class-validator";
+
 export class SignInDto {
-    email: string;
-    password: string;
+    @IsNotEmpty()
+    email!: string;
+    @IsNotEmpty()
+    password!: string;
 }
