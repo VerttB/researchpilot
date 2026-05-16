@@ -3,13 +3,14 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import cookieParser from 'cookie-parser';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { HttpExceptionFilter } from './helpers/filters/exceptions.filter';
 
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.useGlobalPipes(new ValidationPipe())
   app.use(cookieParser());
-
+  app.useGlobalFilters(new HttpExceptionFilter())
    const config = new DocumentBuilder()
     .setTitle('Research Pilot')
     .setDescription('The Research Pilot API description')
