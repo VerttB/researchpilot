@@ -2,9 +2,9 @@ import { Body, Controller, Get, Post, Res } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { SignInDto } from './dto/sign-in.dto';
 import { SignUpDto } from './dto/sign-up.dto';
-import { SkipAuth } from '../../helpers/decorators/skipauth.decorator';
+import { SkipAuth } from '@/helpers/decorators/skipauth.decorator';
 import type { Response } from 'express';
-import { cookieConfig } from '../../helpers/common/cookies.config';
+import { cookieConfig } from '@/helpers/common/cookies.config';
 
 @Controller('auth')
 export class AuthController {
