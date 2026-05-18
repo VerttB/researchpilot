@@ -1,42 +1,71 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { SignInDto } from './dto/sign-in.dto';
 import { SignUpDto } from './dto/sign-up.dto';
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import * as argon2 from 'argon2';
 import { PrismaService } from '@/prisma/prisma.service';
+import { ConfigService } from '@nestjs/config';
+import { Request, Response, response } from 'express';
+import { TokenPayloadDto } from './dto/token-payload.dto';
+import { UUID } from 'crypto';
+import { cookieConfig } from '@/helpers/common/cookies.config';
 @Injectable()
 export class AuthService {
     constructor(
-        private readonly userService: UsersService, 
+        private readonly userService: UsersService,
         private readonly prismaService: PrismaService,
-        private readonly jwtService: JwtService)
-         {}
-    
-    async signUp(signUpDto: SignUpDto) {
+        private readonly configService: ConfigService,
+        private readonly jwtService: JwtService) { }
+
+
+    async verifyUser({ email, password }: SignInDto) {
+        const user = await this.userService.findByEmail(email);
+        const authenticated = argon2.verify(user.passwordHash, password)
+
+        if (!authenticated) {
+            throw new UnauthorizedException("Invalid Email or Password")
+        }
+        return {
+            email: user.email,
+            id: user.id
+        }
+    }
+
+
+    async register(signUpDto: SignUpDto) {
         const passwordHash = await argon2.hash(signUpDto.password);
-        const newUser = await this.prismaService.user.create({data: {email: signUpDto.email, passwordHash: passwordHash}});
+        const newUser = await this.prismaService.user.create({ data: { email: signUpDto.email, passwordHash: passwordHash } });
         const payload = { sub: newUser.id, email: newUser.email, role: newUser.role };
         const token = this.jwtService.sign(payload);
 
         return token
 
     }
-    async signIn(signInDto: SignInDto) {
-        const user = await this.userService.findByEmail(signInDto.email);
-        if (!user) {
-            throw new Error('User not found');
+    async login(user: { id: UUID, email: string }, res: Response) {
+        const expireAcessToken = new Date();
+        expireAcessToken.setMilliseconds(
+            expireAcessToken.getTime() + parseInt(this.configService.getOrThrow("JWT_EXPIRES_ACCESS_TOKEN")),
+        );
+
+        const tokenPayload: TokenPayloadDto = {
+            id: user.id,
+            email: user.email
         }
 
-        if (!await argon2.verify(user.passwordHash, signInDto.password)) {
-            throw new UnauthorizedException('Invalid credentials');
+        const accessToken = this.jwtService.sign(tokenPayload, {
+            secret: this.configService.getOrThrow("JWT_SECRET"),
+            expiresIn: `${this.configService.getOrThrow("JWT_EXPIRES_ACCESS_TOKEN")}ms`
         }
+        )
 
-        const payload = { sub: user.id, email: user.email, role: user.role };
-        const token = this.jwtService.sign(payload);
-
-        return token;
+        res.cookie("Authentication", accessToken, {
+            httpOnly: true,
+            secure: this.configService.get("NODE_ENV") === "production",
+            sameSite: "lax",
+            expires: expireAcessToken
+        })
     }
-    async logout() {}
-    async refresh() {}
+    async logout() { }
+    async refresh() { }
 }

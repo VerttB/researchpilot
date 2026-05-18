@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ReviewsService } from './reviews.service';
 import { randomUUID } from 'crypto';
 import { CreateReviewDto } from './dto/create-review.dto';
-import { NotFoundException } from '@nestjs/common';
+import { NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { ReviewStatus } from '@generated/prisma/enums';
 import { PrismaService } from '@/prisma/prisma.service';
 describe('ReviewsService', () => {
@@ -76,5 +76,29 @@ describe('ReviewsService', () => {
     service.findOne('review-id' as any, 'owner-id' as any),
   ).rejects.toThrow(NotFoundException);
 });
+
+
+it("Should throw Unhautorized Exception, when an users tries to delete a review that is not theirs",async () => {
+    const randomOwner = randomUUID()
+
+    const createReviewDto: CreateReviewDto = {
+    name: 'Teste Review',
+    description: 'Review Teste',
+    status: ReviewStatus.IN_PROGRESS,
+  };
+    const createdReviewMock = {
+      id: randomUUID(),
+      ...createReviewDto,
+      ownerId:randomUUID(), 
+      createdAt: new Date(),
+      updatedAt: null,
+  };
+    prismaMock.review.create.mockResolvedValue(createdReviewMock)
+
+  await expect(
+    service.remove(createdReviewMock.id, randomOwner),
+  ).rejects.toThrow(UnauthorizedException)
+})
+
 });
 
