@@ -6,9 +6,9 @@ import { PrismaModule } from './prisma/prisma.module';
 import { UsersModule } from './resources/users/users.module';
 import { ReviewsModule } from './resources/reviews/reviews.module';
 import { APP_GUARD } from '@nestjs/core';
-import { AuthGuard } from './helpers/guards/auth/auth.guard';
 import { AuthModule } from './resources/auth/auth.module';
 import { JwtModule } from '@nestjs/jwt';
+import { JwtAuthGuard } from './resources/auth/guard/jwt-auth.guard';
 @Module({
   imports: [ConfigModule.forRoot({
     envFilePath: '.env',
@@ -30,7 +30,9 @@ import { JwtModule } from '@nestjs/jwt';
   controllers: [AppController],
   providers: [AppService, {
     provide: APP_GUARD,
-    useClass: AuthGuard
-  }],
+    useClass: JwtAuthGuard
+  }
+  
+],
 })
 export class AppModule {}
