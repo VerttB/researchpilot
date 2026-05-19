@@ -3,12 +3,15 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from '@/prisma/prisma.service';
 import { User } from '@generated/prisma/browser';
 import { UUID } from 'crypto';
+import { CreateUserDto } from './dto/create-user.dto';
 
 @Injectable()
 export class UsersService {
   constructor(private prisma: PrismaService){}
 
-
+  async create(user: CreateUserDto): Promise<User> {
+      return await this.prisma.user.create({data: user})
+  }
   async findAll(): Promise<User[]> {
     const users = await this.prisma.user.findMany();
     return users || []

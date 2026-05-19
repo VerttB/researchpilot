@@ -19,7 +19,16 @@ export class AuthService {
         private readonly configService: ConfigService,
         private readonly jwtService: JwtService) { }
 
+    async verifyUserRefreshToken(refreshToken: string, userId: UUID){
+        const user = await this.userService.findOne(userId);
+        if(!user.refreshToken) throw new UnauthorizedException()
+        const authenticated = argon2.verify(user.refreshToken, refreshToken)
 
+        if (!authenticated) {
+            throw new UnauthorizedException("Invalid Email or Password")
+        }
+        return user
+    }
     async verifyUser({ email, password }: SignInDto) {
         const user = await this.userService.findByEmail(email);
         const authenticated = argon2.verify(user.passwordHash, password)
@@ -49,7 +58,12 @@ export class AuthService {
     async login(user: { id: UUID, email: string }, res: Response) {
         const expireAcessToken = new Date();
         expireAcessToken.setMilliseconds(
-            expireAcessToken.getTime() + parseInt(this.configService.getOrThrow("JWT_EXPIRES_ACCESS_TOKEN")),
+            expireAcessToken.getTime() + parseInt(this.configService.getOrThrow<string>("JWT_EXPIRES_ACCESS_TOKEN")),
+        );
+
+        const expireRefreshToken = new Date();
+        expireRefreshToken.setMilliseconds(
+            expireAcessToken.getTime() + parseInt(this.configService.getOrThrow<string>("JWT_EXPIRES_REFRESH_TOKEN")),
         );
 
         const tokenPayload: TokenPayloadDto = {
@@ -63,11 +77,27 @@ export class AuthService {
         }
         )
 
+        const refreshToken = this.jwtService.sign(tokenPayload, {
+            secret: this.configService.getOrThrow("JWT_REFRESH_SECRET"),
+            expiresIn: `${this.configService.getOrThrow("JWT_EXPIRES_REFRESH_TOKEN")}ms`
+        }
+        )
+
+        const refreshTokenHash = await argon2.hash(refreshToken)
+        await this.userService.update(user.id, { refreshToken: refreshTokenHash})
+
         res.cookie("Authentication", accessToken, {
             httpOnly: true,
             secure: this.configService.get("NODE_ENV") === "production",
             sameSite: "lax",
             expires: expireAcessToken
+        })
+
+        res.cookie("Refresh", refreshToken,  {
+            httpOnly: true,
+            secure: this.configService.get("NODE_ENV") === "production",
+            sameSite: "lax",
+            expires: expireRefreshToken
         })
     }
     async logout() { }

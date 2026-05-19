@@ -23,10 +23,11 @@ model User {
   id    String @id @default(uuid())
   email String @unique
   passwordHash String
+  refreshToken String?
   role Role @default(USER)
   reviews Review[]
   createdAt DateTime @default(now()) @db.Timestamptz(6)
-  updatedAt DateTime @updatedAt
+  updatedAt DateTime? @updatedAt
 
 }
 
@@ -43,5 +44,5 @@ model Review {
   description String
   ownerId String
   createdAt DateTime @default(now()) @db.Timestamptz(6)
-  updatedAt DateTime @updatedAt
+  updatedAt DateTime? @updatedAt
 }

@@ -5,6 +5,7 @@ import { Public } from '@/helpers/decorators/public.decorator';
 import type { Response } from 'express';
 import { LocalGuard } from './guard/local-auth.guard';
 import { CurrentUser } from '@/helpers/decorators/currentUser.decorator';
+import { JwtRefreshAuthGuard } from './guard/jwt-refresh-auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -32,8 +33,9 @@ export class AuthController {
     return this.authService.logout();
   }
 
-  @Get('refresh')
-  async refresh() {
-    return this.authService.refresh();
+  @Post('refresh')
+  @UseGuards(JwtRefreshAuthGuard)
+  async refresh(@CurrentUser() user, @Res({ passthrough: true}) res: Response) {
+    return await this.authService.login(user, res);
   }
 }

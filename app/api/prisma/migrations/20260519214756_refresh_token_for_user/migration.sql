@@ -1,0 +1,6 @@
+-- AlterTable
+ALTER TABLE "Review" ALTER COLUMN "updatedAt" SET DATA TYPE TIMESTAMP(3);
+
+-- AlterTable
+ALTER TABLE "User" ADD COLUMN     "refreshToken" TEXT,
+ALTER COLUMN "updatedAt" SET DATA TYPE TIMESTAMP(3);
