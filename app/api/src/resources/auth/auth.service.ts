@@ -10,11 +10,12 @@ import { Request, Response, response } from 'express';
 import { TokenPayloadDto } from './dto/token-payload.dto';
 import { UUID } from 'crypto';
 import { cookieConfig } from '@/helpers/common/cookies.config';
+import { CreateUserDto } from '../users/dto/create-user.dto';
+import { Role } from '@generated/prisma/enums';
 @Injectable()
 export class AuthService {
     constructor(
         private readonly userService: UsersService,
-        private readonly prismaService: PrismaService,
         private readonly configService: ConfigService,
         private readonly jwtService: JwtService) { }
 
@@ -35,11 +36,14 @@ export class AuthService {
 
     async register(signUpDto: SignUpDto) {
         const passwordHash = await argon2.hash(signUpDto.password);
-        const newUser = await this.prismaService.user.create({ data: { email: signUpDto.email, passwordHash: passwordHash } });
-        const payload = { sub: newUser.id, email: newUser.email, role: newUser.role };
-        const token = this.jwtService.sign(payload);
-
-        return token
+        const user: CreateUserDto = {
+            email: signUpDto.email,
+            passwordHash: passwordHash,
+            role: Role.USER
+        }
+        const newUser = await this.userService.create(user);
+      
+        return true
 
     }
     async login(user: { id: UUID, email: string }, res: Response) {
